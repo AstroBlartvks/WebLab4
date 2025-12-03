@@ -5,17 +5,11 @@ const API_URL = 'http://localhost:8080/api/auth';
 
 export const login = createAsyncThunk('auth/login', async ({ username, password }) => {
   const response = await axios.post(`${API_URL}/login`, { username, password });
-  localStorage.setItem('token', response.data.token);
-  localStorage.setItem('userId', response.data.userId);
-  localStorage.setItem('username', response.data.username);
   return response.data;
 });
 
 export const register = createAsyncThunk('auth/register', async ({ username, password }) => {
   const response = await axios.post(`${API_URL}/register`, { username, password });
-  localStorage.setItem('token', response.data.token);
-  localStorage.setItem('userId', response.data.userId);
-  localStorage.setItem('username', response.data.username);
   return response.data;
 });
 
@@ -34,9 +28,6 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
     },
   },
   extraReducers: (builder) => {

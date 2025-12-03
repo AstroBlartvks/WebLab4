@@ -20,8 +20,6 @@ eureka:
   instance:
     prefer-ip-address: true
 
-jwt:
-  secret: lab4-microservices-secret-key-must-be-at-least-256-bits-long-for-security
 
 logging:
   level:

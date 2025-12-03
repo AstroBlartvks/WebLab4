@@ -25,5 +25,5 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  secret: lab4-microservices-secret-key-must-be-at-least-256-bits-long-for-security
-  expiration: 86400000
+  secret: ${JWT_SECRET:lab4-microservices-secret-key-must-be-at-least-256-bits-long-for-security}
+  expiration: ${JWT_EXPIRATION:86400000}

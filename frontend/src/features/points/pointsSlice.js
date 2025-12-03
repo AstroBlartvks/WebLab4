@@ -13,13 +13,14 @@ export const checkPoint = createAsyncThunk('points/checkPoint', async ({ x, y, r
   return response.data;
 });
 
-export const fetchHistory = createAsyncThunk('points/fetchHistory', async () => {
-  const response = await axios.get(`${API_URL}/history`, { headers: getAuthHeader() });
+export const fetchHistory = createAsyncThunk('points/fetchHistory', async ({ offset = 0, limit = 100 } = {}) => {
+  const response = await axios.get(`${API_URL}/history?offset=${offset}&limit=${limit}`, { headers: getAuthHeader() });
   return response.data;
 });
 
-export const clearHistory = createAsyncThunk('points/clearHistory', async () => {
+export const clearHistory = createAsyncThunk('points/clearHistory', async (_, { dispatch }) => {
   await axios.delete(`${API_URL}/history`, { headers: getAuthHeader() });
+  dispatch(fetchHistory());
 });
 
 const pointsSlice = createSlice({
@@ -59,8 +60,14 @@ const pointsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(clearHistory.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(clearHistory.fulfilled, (state) => {
-        state.points = [];
+        state.loading = false;
+      })
+      .addCase(clearHistory.rejected, (state) => {
+        state.loading = false;
       });
   },
 });

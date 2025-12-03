@@ -5,6 +5,8 @@ import com.lab.points.dto.PointCheckResponse;
 import com.lab.points.entity.PointCheck;
 import com.lab.points.repository.PointCheckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,16 +35,17 @@ public class PointService {
         return false;
     }
 
-    public PointCheckResponse checkPoint(Long userId, CheckPointRequest request) {
+    public PointCheckResponse checkPoint(Long userId, String username, CheckPointRequest request) {
         long startTime = System.nanoTime();
-        boolean isHit = checkHit(request.getX(), request.getY(), request.getR());
+        boolean isHit = checkHit(request.x(), request.y(), request.r());
         long executionTime = System.nanoTime() - startTime;
 
         PointCheck pointCheck = new PointCheck(
             userId,
-            request.getX(),
-            request.getY(),
-            request.getR(),
+            username,
+            request.x(),
+            request.y(),
+            request.r(),
             isHit,
             executionTime
         );
@@ -56,12 +59,14 @@ public class PointService {
             pointCheck.getR(),
             pointCheck.getIsHit(),
             pointCheck.getExecutionTimeNs(),
-            pointCheck.getCheckedAt()
+            pointCheck.getCheckedAt(),
+            pointCheck.getUsername()
         );
     }
 
-    public List<PointCheckResponse> getHistory(Long userId) {
-        return repository.findByUserIdOrderByCheckedAtDesc(userId).stream()
+    public List<PointCheckResponse> getHistory(int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        return repository.findAllByOrderByCheckedAtDesc(pageable).stream()
             .map(pc -> new PointCheckResponse(
                 pc.getId(),
                 pc.getX(),
@@ -69,7 +74,8 @@ public class PointService {
                 pc.getR(),
                 pc.getIsHit(),
                 pc.getExecutionTimeNs(),
-                pc.getCheckedAt()
+                pc.getCheckedAt(),
+                pc.getUsername()
             ))
             .collect(Collectors.toList());
     }

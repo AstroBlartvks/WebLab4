@@ -15,6 +15,9 @@ public class PointCheck {
     private Long userId;
 
     @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private Double x;
 
     @Column(nullable = false)
@@ -36,8 +39,9 @@ public class PointCheck {
         this.checkedAt = LocalDateTime.now();
     }
 
-    public PointCheck(Long userId, Double x, Double y, Double r, Boolean isHit, Long executionTimeNs) {
+    public PointCheck(Long userId, String username, Double x, Double y, Double r, Boolean isHit, Long executionTimeNs) {
         this.userId = userId;
+        this.username = username;
         this.x = x;
         this.y = y;
         this.r = r;
@@ -60,6 +64,14 @@ public class PointCheck {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Double getX() {
