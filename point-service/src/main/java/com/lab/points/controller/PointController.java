@@ -1,14 +1,13 @@
 package com.lab.points.controller;
 
 import com.lab.points.dto.CheckPointRequest;
+import com.lab.points.dto.PagedResponse;
 import com.lab.points.dto.PointCheckResponse;
 import com.lab.points.service.PointService;
 import com.lab.points.service.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping
@@ -31,10 +30,10 @@ public class PointController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<PointCheckResponse>> getHistory(
-            @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "100") int limit) {
-        List<PointCheckResponse> history = pointService.getHistory(offset, limit);
+    public ResponseEntity<PagedResponse<PointCheckResponse>> getHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PagedResponse<PointCheckResponse> history = pointService.getHistory(page, size);
         return ResponseEntity.ok(history);
     }
 

@@ -1,10 +1,27 @@
 import React from 'react';
+import Pagination from './Pagination';
 
-const PointsTable = ({ points, onClearHistory }) => {
+const PointsTable = ({
+  points,
+  onClearHistory,
+  currentPage,
+  totalPages,
+  onPageChange,
+  pageSize,
+  onPageSizeChange,
+  totalElements
+}) => {
   return (
     <div className="table-section">
-      <h2>История проверок</h2>
-      <button onClick={onClearHistory} className="clear-btn">Очистить историю</button>
+      <div className="table-header">
+        <h2>История проверок</h2>
+        <div className="table-actions">
+          {totalElements > 0 && (
+            <span className="total-count">Всего записей: {totalElements}</span>
+          )}
+          <button onClick={onClearHistory} className="clear-btn">Очистить историю</button>
+        </div>
+      </div>
       <div className="table-wrapper">
         <table>
           <thead>
@@ -19,22 +36,37 @@ const PointsTable = ({ points, onClearHistory }) => {
             </tr>
           </thead>
           <tbody>
-            {points.map((point) => (
-              <tr key={point.id}>
-                <td>{point.username}</td>
-                <td>{point.x}</td>
-                <td>{point.y.toFixed(2)}</td>
-                <td>{point.r}</td>
-                <td className={point.isHit ? 'hit' : 'miss'}>
-                  {point.isHit ? 'Попадание' : 'Промах'}
+            {points.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
+                  История пуста
                 </td>
-                <td>{point.executionTimeNs}</td>
-                <td>{new Date(point.timestamp).toLocaleString('ru-RU')}</td>
               </tr>
-            ))}
+            ) : (
+              points.map((point) => (
+                <tr key={point.id}>
+                  <td>{point.username}</td>
+                  <td>{point.x}</td>
+                  <td>{point.y.toFixed(2)}</td>
+                  <td>{point.r}</td>
+                  <td className={point.isHit ? 'hit' : 'miss'}>
+                    {point.isHit ? 'Попадание' : 'Промах'}
+                  </td>
+                  <td>{point.executionTimeNs}</td>
+                  <td>{new Date(point.timestamp).toLocaleString('ru-RU')}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        pageSize={pageSize}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 };

@@ -8,19 +8,22 @@ const getAuthHeader = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
-export const checkPoint = createAsyncThunk('points/checkPoint', async ({ x, y, r }) => {
+export const checkPoint = createAsyncThunk('points/checkPoint', async ({ x, y, r }, { dispatch, getState }) => {
   const response = await axios.post(`${API_URL}/check`, { x, y, r }, { headers: getAuthHeader() });
+  const { pageSize } = getState().points;
+  dispatch(fetchHistory({ page: 0, size: pageSize }));
   return response.data;
 });
 
-export const fetchHistory = createAsyncThunk('points/fetchHistory', async ({ offset = 0, limit = 100 } = {}) => {
-  const response = await axios.get(`${API_URL}/history?offset=${offset}&limit=${limit}`, { headers: getAuthHeader() });
+export const fetchHistory = createAsyncThunk('points/fetchHistory', async ({ page = 0, size = 10 } = {}) => {
+  const response = await axios.get(`${API_URL}/history?page=${page}&size=${size}`, { headers: getAuthHeader() });
   return response.data;
 });
 
-export const clearHistory = createAsyncThunk('points/clearHistory', async (_, { dispatch }) => {
+export const clearHistory = createAsyncThunk('points/clearHistory', async (_, { dispatch, getState }) => {
   await axios.delete(`${API_URL}/history`, { headers: getAuthHeader() });
-  dispatch(fetchHistory());
+  const { pageSize } = getState().points;
+  dispatch(fetchHistory({ page: 0, size: pageSize }));
 });
 
 const pointsSlice = createSlice({
@@ -30,10 +33,21 @@ const pointsSlice = createSlice({
     loading: false,
     error: null,
     currentR: 5,
+    currentPage: 0,
+    pageSize: 10,
+    totalElements: 0,
+    totalPages: 0,
   },
   reducers: {
     setR: (state, action) => {
       state.currentR = action.payload;
+    },
+    setPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
+    setPageSize: (state, action) => {
+      state.pageSize = action.payload;
+      state.currentPage = 0;
     },
   },
   extraReducers: (builder) => {
@@ -43,7 +57,6 @@ const pointsSlice = createSlice({
       })
       .addCase(checkPoint.fulfilled, (state, action) => {
         state.loading = false;
-        state.points.unshift(action.payload);
       })
       .addCase(checkPoint.rejected, (state, action) => {
         state.loading = false;
@@ -54,7 +67,11 @@ const pointsSlice = createSlice({
       })
       .addCase(fetchHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.points = action.payload;
+        state.points = action.payload.content;
+        state.currentPage = action.payload.page;
+        state.pageSize = action.payload.size;
+        state.totalElements = action.payload.totalElements;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchHistory.rejected, (state, action) => {
         state.loading = false;
@@ -72,5 +89,5 @@ const pointsSlice = createSlice({
   },
 });
 
-export const { setR } = pointsSlice.actions;
+export const { setR, setPage, setPageSize } = pointsSlice.actions;
 export default pointsSlice.reducer;

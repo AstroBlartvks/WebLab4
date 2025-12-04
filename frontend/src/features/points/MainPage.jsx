@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../auth/authSlice';
-import { fetchHistory, checkPoint, clearHistory, setR } from './pointsSlice';
+import { fetchHistory, checkPoint, clearHistory, setR, setPage, setPageSize } from './pointsSlice';
 import Canvas from './Canvas';
 import Header from './components/Header';
 import PointForm from './components/PointForm';
@@ -13,11 +13,18 @@ const MainPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const { points, currentR } = useSelector((state) => state.points);
+  const {
+    points,
+    currentR,
+    currentPage,
+    pageSize,
+    totalElements,
+    totalPages
+  } = useSelector((state) => state.points);
 
   useEffect(() => {
-    dispatch(fetchHistory());
-  }, [dispatch]);
+    dispatch(fetchHistory({ page: currentPage, size: pageSize }));
+  }, [dispatch, currentPage, pageSize]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -34,6 +41,14 @@ const MainPage = () => {
 
   const handleClearHistory = () => {
     dispatch(clearHistory());
+  };
+
+  const handlePageChange = (newPage) => {
+    dispatch(setPage(newPage));
+  };
+
+  const handlePageSizeChange = (newSize) => {
+    dispatch(setPageSize(newSize));
   };
 
   const handleCanvasClick = (cx, cy) => {
@@ -70,6 +85,12 @@ const MainPage = () => {
           <PointsTable
             points={points}
             onClearHistory={handleClearHistory}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            totalElements={totalElements}
           />
         </div>
       </div>

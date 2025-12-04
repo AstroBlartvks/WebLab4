@@ -108,11 +108,39 @@
 
 .clear-btn {
   background: #e74c3c;
-  margin-bottom: 15px;
+  width: auto;
+  padding: 8px 16px;
+  margin: 0;
 }
 
 .clear-btn:hover {
   background: #c0392b;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.table-header h2 {
+  margin: 0;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.total-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 }
 
 .table-wrapper {

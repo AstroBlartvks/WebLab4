@@ -1,10 +1,12 @@
 package com.lab.points.service;
 
 import com.lab.points.dto.CheckPointRequest;
+import com.lab.points.dto.PagedResponse;
 import com.lab.points.dto.PointCheckResponse;
 import com.lab.points.entity.PointCheck;
 import com.lab.points.repository.PointCheckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -64,9 +66,11 @@ public class PointService {
         );
     }
 
-    public List<PointCheckResponse> getHistory(int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit);
-        return repository.findAllByOrderByCheckedAtDesc(pageable).stream()
+    public PagedResponse<PointCheckResponse> getHistory(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PointCheck> pageResult = repository.findAllByOrderByCheckedAtDesc(pageable);
+
+        List<PointCheckResponse> content = pageResult.getContent().stream()
             .map(pc -> new PointCheckResponse(
                 pc.getId(),
                 pc.getX(),
@@ -78,6 +82,14 @@ public class PointService {
                 pc.getUsername()
             ))
             .collect(Collectors.toList());
+
+        return new PagedResponse<>(
+            content,
+            pageResult.getNumber(),
+            pageResult.getSize(),
+            pageResult.getTotalElements(),
+            pageResult.getTotalPages()
+        );
     }
 
     @Transactional
