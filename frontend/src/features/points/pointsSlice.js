@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/points';
+const API_URL = '/api/points';
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token');
